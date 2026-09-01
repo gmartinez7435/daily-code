@@ -1,0 +1,67 @@
+.home {
+  width: 100%;
+  min-height: 100dvh;
+  padding: var(--app-padding);
+}
+.home-header {
+  text-align: center;
+}
+.home-greeting {
+  margin-top: var(--space-lg);
+}
+.daily {
+  color: var(--purple);
+}
+.project-card {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.project-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.project-head span {
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--purple-dark);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+.project-title {
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  font-size: 1.5rem;
+}
+.project-description {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.project-focus {
+  display: inline-block;
+  margin-top: var(--space-sm);
+  padding: 0.3rem 0.6rem;
+  background-color: rgba(251, 191, 36, 0.12);
+  color: var(--warning);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+.project-skills {
+  color: var(--purple-light);
+  font-size: 0.9rem;
+}
+.start-btn {
+  width: 100%;
+  margin-top: var(--space-lg);
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--purple-gradient);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -1,5 +1,36 @@
 import "./Home.css";
 
+const days = [
+  {
+    name: "Mon",
+    status: "done",
+  },
+  {
+    name: "Tue",
+    status: "done",
+  },
+  {
+    name: "Wed",
+    status: "current",
+  },
+  {
+    name: "Thu",
+    status: "pending",
+  },
+  {
+    name: "Fri",
+    status: "pending",
+  },
+  {
+    name: "Sat",
+    status: "pending",
+  },
+  {
+    name: "Sun",
+    status: "pending",
+  },
+];
+
 function Home() {
   return (
     <main className="home">
@@ -25,6 +56,31 @@ function Home() {
         <p className="project-skills">Focus: Arrays · DOM · filter()</p>
         <button className="start-btn">Start Coding</button>
       </div>
+      <section className="week-progress">
+        <h3>THIS WEEK</h3>
+        <div className="week-days">
+          {days.map((day) => (
+            <div key={day.name}>
+              <p>{day.name}</p>
+              {day.status === "done"
+                ? "✅"
+                : day.status === "current"
+                  ? "🔥"
+                  : "⭕️"}
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="progress-card">
+        <div className="pro-card-head">
+          <h3>Progress</h3>
+          <span>14/20</span>
+        </div>
+        <div className="progress-bar">
+          <div className="progress-fill"></div>
+        </div>
+        <p>Projects completed this month</p>
+      </section>
     </main>
   );
 }

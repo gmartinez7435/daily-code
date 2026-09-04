@@ -1,37 +1,42 @@
+import { useEffect, useState } from "react";
+import projects from "../data/projects";
 import "./Home.css";
 
+const currentDay = new Date().getDay();
+
 const days = [
-  {
-    name: "Mon",
-    status: "done",
-  },
-  {
-    name: "Tue",
-    status: "done",
-  },
-  {
-    name: "Wed",
-    status: "current",
-  },
-  {
-    name: "Thu",
-    status: "pending",
-  },
-  {
-    name: "Fri",
-    status: "pending",
-  },
-  {
-    name: "Sat",
-    status: "pending",
-  },
-  {
-    name: "Sun",
-    status: "pending",
-  },
+  { name: "Sun" },
+  { name: "Mon" },
+  { name: "Tue" },
+  { name: "Wed" },
+  { name: "Thu" },
+  { name: "Fri" },
+  { name: "Sat" },
 ];
 
+const completedProjects = 14;
+const totalProjects = 20;
+
+const progressPercent = (completedProjects / totalProjects) * 100;
+
 function Home() {
+  const [completedProjectIds, setCompletedProjectIds] = useState(() => {
+    const savedProjects = localStorage.getItem("completedProjectIds");
+
+    return savedProjects ? JSON.parse(savedProjects) : [];
+  });
+
+  const todaysProject = projects.find(
+    (project) => !completedProjectIds.includes(project.id),
+  );
+
+  useEffect(() => {
+    localStorage.setItem(
+      "completedProjectIds",
+      JSON.stringify(completedProjectIds),
+    );
+  }, [completedProjectIds]);
+
   return (
     <main className="home">
       <header className="home-header">
@@ -46,27 +51,21 @@ function Home() {
       <div className="project-card">
         <div className="project-head">
           <p>TODAYS PROJECT</p>
-          <span>DAY 1</span>
+          <span>DAY {todaysProject.id}</span>
         </div>
-        <h3 className="project-title">DOM List Filter</h3>
-        <p className="project-description">
-          Build a list that lets the user filter items with JavaScript.
-        </p>
+        <h3 className="project-title">{todaysProject.title}</h3>
+        <p className="project-description">{todaysProject.description}</p>
         <span className="project-focus">JavaScript</span>
-        <p className="project-skills">Focus: Arrays · DOM · filter()</p>
+        <p className="project-skills">Focus: {todaysProject.skills}</p>
         <button className="start-btn">Start Coding</button>
       </div>
       <section className="week-progress">
         <h3>THIS WEEK</h3>
         <div className="week-days">
-          {days.map((day) => (
+          {days.map((day, index) => (
             <div key={day.name}>
               <p>{day.name}</p>
-              {day.status === "done"
-                ? "✅"
-                : day.status === "current"
-                  ? "🔥"
-                  : "⭕️"}
+              {index === currentDay ? "🔥" : "⭕️"}
             </div>
           ))}
         </div>
@@ -74,10 +73,15 @@ function Home() {
       <section className="progress-card">
         <div className="pro-card-head">
           <h3>Progress</h3>
-          <span>14/20</span>
+          <span>
+            {completedProjects}/{totalProjects}
+          </span>
         </div>
         <div className="progress-bar">
-          <div className="progress-fill"></div>
+          <div
+            className="progress-fill"
+            style={{ width: `${progressPercent}%` }}
+          ></div>
         </div>
         <p>Projects completed this month</p>
       </section>

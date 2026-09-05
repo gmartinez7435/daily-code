@@ -63,6 +63,7 @@ let swapOffset = 0;
 let project;
 let hintIndex = -1;
 let projectPassed = false;
+let activeRunId = 0;
 
 function localDateKey(date){
   const year=date.getFullYear();
@@ -104,14 +105,16 @@ function showNextHint(){
   $('#hint-text').textContent=projectHints[hintIndex];
   $('#hint-button').textContent=hintIndex===projectHints.length-1?'Hide hints':hintIndex===0?'Show another hint':'Show final hint';
 }
-function buildDocument(code){
+function buildDocument(code,runId){
   const safe=code.replace(/<\/script/gi,'<\\/script');
-  const bridge=`<script>const original=console.log;console.log=(...a)=>{parent.postMessage({type:'console',value:a.map(String).join(' ')},'*');original(...a)};window.onerror=(m,s,l)=>parent.postMessage({type:'error',value:m+' (line '+l+')'},'*');</script>`;
-  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${project.css}</style></head><body>${project.html}${bridge}<script>${safe}</script><script>${validators[project.id]}</script></body></html>`;
+  const validator=validators[project.id].replaceAll('parent.postMessage({',`parent.postMessage({runId:${runId},`);
+  const bridge=`<script>const runId=${runId};const original=console.log;console.log=(...a)=>{parent.postMessage({runId,type:'console',value:a.map(String).join(' ')},'*');original(...a)};window.onerror=(m,s,l)=>parent.postMessage({runId,type:'error',value:m+' (line '+l+')'},'*');</script>`;
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${project.css}</style></head><body>${project.html}${bridge}<script>${safe}</script><script>${validator}</script></body></html>`;
 }
 function runCode(){
+  activeRunId++;
   projectPassed=false; updateCompletionButton();
-  const code=$('#code-editor').value; localStorage.setItem(`cd-code-${project.id}`,code); $('#save-status').textContent='Saved'; $('#console-output').innerHTML='<span>Running…</span>'; $('#preview').srcdoc=buildDocument(code);
+  const code=$('#code-editor').value; localStorage.setItem(`cd-code-${project.id}`,code); $('#save-status').textContent='Saved'; $('#console-output').innerHTML='<span>Running…</span>'; $('#preview').srcdoc=buildDocument(code,activeRunId);
   setTimeout(()=>{if($('#console-output').textContent==='Running…') $('#console-output').innerHTML='<span>✓ Code ran. Now test the project in Preview.</span>'},350);
   switchPanel('preview');
 }
@@ -135,9 +138,9 @@ document.querySelectorAll('.file-tab').forEach(button=>button.addEventListener('
 $('#run-code').addEventListener('click',runCode);
 $('#hint-button').addEventListener('click',showNextHint);
 $('#swap-project').addEventListener('click',()=>{swapOffset++;chooseProject()});
-$('#reset-code').addEventListener('click',()=>{if(confirm('Reset your JavaScript for this project?')){$('#code-editor').value=project.starter;localStorage.removeItem(`cd-code-${project.id}`);projectPassed=false;updateCompletionButton();updateLines();switchPanel('code')}});
+$('#reset-code').addEventListener('click',()=>{if(confirm('Reset your JavaScript for this project?')){activeRunId++;$('#code-editor').value=project.starter;localStorage.removeItem(`cd-code-${project.id}`);projectPassed=false;updateCompletionButton();$('#console-output').innerHTML='<span>Reset complete. Write code, then Save & Run.</span>';$('#preview').srcdoc=buildDocument(project.starter,activeRunId);updateLines();switchPanel('code')}});
 $('#complete-project').addEventListener('click',()=>{if(!projectPassed||isTodayComplete())return;completions.push({date:dateKey,projectId:project.id});localStorage.setItem('cd-completions',JSON.stringify(completions));updateProgress();updateCompletionButton()});
 $('#code-editor').addEventListener('input',()=>{projectPassed=false;updateCompletionButton();$('#save-status').textContent='Editing…';updateLines();clearTimeout(window.saveTimer);window.saveTimer=setTimeout(()=>{localStorage.setItem(`cd-code-${project.id}`,$('#code-editor').value);$('#save-status').textContent='Saved'},500)});
 $('#code-editor').addEventListener('keydown',event=>{if(event.key==='Tab'){event.preventDefault();const el=event.target;const start=el.selectionStart;el.value=el.value.slice(0,start)+'  '+el.value.slice(el.selectionEnd);el.selectionStart=el.selectionEnd=start+2;updateLines()}});
-window.addEventListener('message',event=>{if(event.source!==$('#preview').contentWindow||!event.data?.type)return;if(event.data.type==='success'){projectPassed=true;updateCompletionButton()}const row=document.createElement('div');row.className=event.data.type;const icons={error:'✕ ',warning:'⚠ ',success:'✓ ',progress:'→ ',console:'› '};row.textContent=(icons[event.data.type]||'› ')+event.data.value;if($('#console-output').textContent==='Running…'||$('#console-output').textContent.includes('Code ran.'))$('#console-output').innerHTML='';$('#console-output').append(row)});
+window.addEventListener('message',event=>{if(event.source!==$('#preview').contentWindow||event.data?.runId!==activeRunId||!event.data?.type)return;if(event.data.type==='success'){projectPassed=true;updateCompletionButton()}const row=document.createElement('div');row.className=event.data.type;const icons={error:'✕ ',warning:'⚠ ',success:'✓ ',progress:'→ ',console:'› '};row.textContent=(icons[event.data.type]||'› ')+event.data.value;if($('#console-output').textContent==='Running…'||$('#console-output').textContent.includes('Code ran.')||$('#console-output').textContent.includes('Reset complete.'))$('#console-output').innerHTML='';$('#console-output').append(row)});
 updateProgress();chooseProject();switchPanel('code');

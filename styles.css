@@ -3,6 +3,10 @@
 .hint-btn{width:100%;min-height:2.8rem;margin-top:1rem;border:1px solid rgba(255,184,107,.4);border-radius:.75rem;background:rgba(255,184,107,.08);color:#ffd09a;font-weight:750;font-size:.88rem;position:relative;z-index:1}.hint-box{margin-top:.65rem;padding:.85rem;border-radius:.8rem;background:#0d162b;border:1px solid #34415f;position:relative;z-index:1}.hint-box span{font-size:.65rem;letter-spacing:.12em;color:var(--orange);font-weight:800}.hint-box p{margin:.35rem 0 0;color:#c9d3e8;font-size:.86rem;line-height:1.45}.hint-box[hidden]{display:none}
 .console .success{color:var(--green)}.console .warning{color:var(--orange)}.console .progress{color:var(--cyan)}
 .complete-btn:disabled{cursor:not-allowed;opacity:.55;border-color:#46516b;background:#151d31;color:#8995af;box-shadow:none}
+@media(max-width:40rem){
+  .topbar{padding:.5rem max(1rem,env(safe-area-inset-right)) .85rem max(1rem,env(safe-area-inset-left))}
+  main{padding-top:2.25rem}
+}
 @media(min-width:48rem){main{padding-top:3rem}.intro{text-align:center;margin-bottom:2rem}.workspace{margin-top:1.2rem}.project-card{padding:1.7rem}.editor-wrap{height:23rem}}
 @media(min-width:64rem){
   .topbar{padding-left:max(2rem,calc((100vw - 74rem)/2));padding-right:max(2rem,calc((100vw - 74rem)/2))}

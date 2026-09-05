@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="A new hands-on vanilla JavaScript project every day.">
+  <title>CodeDaily — Learn JavaScript by Building</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="CodeDaily home"><span class="brand-mark">{ }</span> CodeDaily</a>
+    <div class="streak" aria-label="Current streak"><span>🔥</span><strong id="streak-count">0</strong><small>day streak</small></div>
+  </header>
+
+  <main>
+    <div class="learning-column">
+    <section class="intro">
+      <p class="eyebrow" id="today-label">TODAY</p>
+      <h1 id="greeting">Good morning, Gabriel.</h1>
+      <p>One small project. Just JavaScript.</p>
+    </section>
+
+    <section class="progress-card" aria-labelledby="progress-title">
+      <div class="progress-copy"><span id="progress-title">Weekly progress</span><strong id="progress-text">0 of 7</strong></div>
+      <div class="progress-track"><span id="progress-fill"></span></div>
+      <div class="week" id="week-days" aria-label="Days this week"></div>
+    </section>
+
+    <section class="project-card">
+      <div class="project-topline"><span class="level" id="level">BEGINNER</span><button class="swap-btn" id="swap-project" type="button" aria-label="Choose another project">↻ New project</button></div>
+      <h2 id="project-title"></h2>
+      <p id="project-description"></p>
+      <div class="concepts" id="concepts"></div>
+      <div class="mission"><span>YOUR MISSION</span><p id="mission"></p></div>
+      <button class="hint-btn" id="hint-button" type="button">💡 Give me a hint</button>
+      <div class="hint-box" id="hint-box" hidden aria-live="polite">
+        <span id="hint-number">HINT 1 OF 3</span>
+        <p id="hint-text"></p>
+      </div>
+    </section>
+
+    <button class="complete-btn" id="complete-project" type="button" disabled>🔒 Pass the project to unlock</button>
+    </div>
+
+    <div class="coding-column">
+    <section class="workspace" aria-label="JavaScript coding workspace">
+      <div class="workspace-head">
+        <div class="tabs" role="tablist"><button class="tab active" data-panel="code" role="tab">JavaScript</button><button class="tab" data-panel="preview" role="tab">Preview</button></div>
+        <span class="autosave" id="save-status">Saved</span>
+      </div>
+      <div class="panel active" id="code-panel">
+        <div class="editor-wrap">
+          <div class="line-numbers" id="line-numbers" aria-hidden="true">1</div>
+          <textarea id="code-editor" aria-label="JavaScript code editor" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+        </div>
+        <div class="console" id="console-output" aria-live="polite"><span>Console ready.</span></div>
+      </div>
+      <div class="panel preview-panel" id="preview-panel"><iframe id="preview" title="Project preview" sandbox="allow-scripts"></iframe></div>
+      <div class="actions"><button class="secondary" id="reset-code" type="button">Reset</button><button class="run-btn" id="run-code" type="button"><span>▶</span> Save & Run</button></div>
+    </section>
+
+    <details class="starter-files">
+      <summary>View the provided HTML & CSS</summary>
+      <p>You don't need to edit these. They're already connected to your JavaScript.</p>
+      <div class="file-tabs"><button class="file-tab active" data-file="html">HTML</button><button class="file-tab" data-file="css">CSS</button></div>
+      <pre id="starter-code"></pre>
+    </details>
+    </div>
+  </main>
+  <footer>Built for daily practice • Your work stays on this device</footer>
+  <script src="app.js?v=3"></script>
+</body>
+</html>

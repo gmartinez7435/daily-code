@@ -56,6 +56,10 @@ const validators = {
   password: `(function(){const password=document.querySelector('#password');const feedback=document.querySelector('#feedback');const initial=feedback.textContent;password.addEventListener('input',function(){setTimeout(function(){const worked=feedback.textContent!==initial;parent.postMessage({type:worked?'success':'warning',value:worked?'Success! The feedback changes as you type.':'You typed, but the password feedback did not change.'},'*')},0)})})()`
 };
 
+projects.push(...window.moreProjects);
+Object.assign(hints,window.moreHints);
+Object.assign(validators,window.moreValidators);
+
 const $ = selector => document.querySelector(selector);
 const dateKey = localDateKey(new Date());
 const completions = readCompletions();
@@ -87,7 +91,18 @@ function updateCompletionButton(){
   button.classList.toggle('completed',isDone);
 }
 function hashDate(value){return [...value].reduce((sum,char)=>(sum*31+char.charCodeAt(0))>>>0,0)}
-function chooseProject(){const finishedProjects=new Set(completions.map(item=>item.projectId));const available=projects.filter(item=>!finishedProjects.has(item.id));const pool=available.length?available:projects;project=pool[(hashDate(dateKey)+swapOffset)%pool.length];renderProject()}
+function chooseProject(shuffle=false){
+  const finishedProjects=new Set(completions.map(item=>item.projectId));
+  const available=projects.filter(item=>!finishedProjects.has(item.id));
+  const pool=available.length?available:projects;
+  if(shuffle&&pool.length>1){
+    const choices=pool.filter(item=>item.id!==project?.id);
+    project=choices[Math.floor(Math.random()*choices.length)];
+  }else{
+    project=pool[(hashDate(dateKey)+swapOffset)%pool.length];
+  }
+  renderProject();
+}
 function renderProject(){
   $('#project-title').textContent=project.title; $('#project-description').textContent=project.description; $('#mission').textContent=project.mission;
   $('#concepts').innerHTML=project.concepts.map(item=>`<span>${item}</span>`).join('');
@@ -145,7 +160,7 @@ document.querySelectorAll('.tab').forEach(button=>button.addEventListener('click
 document.querySelectorAll('.file-tab').forEach(button=>button.addEventListener('click',()=>showStarter(button.dataset.file)));
 $('#run-code').addEventListener('click',runCode);
 $('#hint-button').addEventListener('click',showNextHint);
-$('#swap-project').addEventListener('click',()=>{swapOffset++;chooseProject()});
+$('#swap-project').addEventListener('click',()=>chooseProject(true));
 $('#reset-code').addEventListener('click',()=>{if(confirm('Reset your JavaScript for this project?')){activeRunId++;$('#code-editor').value=project.starter;localStorage.removeItem(`cd-code-${project.id}`);projectPassed=false;updateCompletionButton();$('#console-output').innerHTML='<span>Reset complete. Write code, then Save & Run.</span>';loadPreview(buildDocument(project.starter,activeRunId));updateLines();switchPanel('code')}});
 $('#complete-project').addEventListener('click',()=>{if(!projectPassed||isTodayComplete())return;completions.push({date:dateKey,projectId:project.id});localStorage.setItem('cd-completions',JSON.stringify(completions));updateProgress();updateCompletionButton()});
 $('#code-editor').addEventListener('input',()=>{projectPassed=false;updateCompletionButton();$('#save-status').textContent='Editing…';updateLines();clearTimeout(window.saveTimer);window.saveTimer=setTimeout(()=>{localStorage.setItem(`cd-code-${project.id}`,$('#code-editor').value);$('#save-status').textContent='Saved'},500)});

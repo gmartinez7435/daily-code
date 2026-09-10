@@ -4,36 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b1020">
-  <meta name="description" content="A new hands-on vanilla JavaScript project every day.">
+  <meta name="description" content="100 offline-ready JavaScript projects. Learn by building at your own pace.">
   <title>CodeDaily — Learn JavaScript by Building</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="#" aria-label="CodeDaily home"><span class="brand-mark">{ }</span> CodeDaily</a>
-    <div class="streak" aria-label="Current streak"><span>🔥</span><strong id="streak-count">0</strong><small>day streak</small></div>
+    <div class="streak" aria-label="Completed projects"><span>🔥</span><strong id="streak-count">0</strong><small>completed</small></div>
   </header>
 
   <main>
     <div class="learning-column">
+    <div id="app-notice" role="status" hidden></div>
+    <div id="load-error" role="alert" hidden><p></p><button id="retry-load" type="button">Retry loading</button></div>
     <section class="intro">
-      <p class="eyebrow" id="today-label">TODAY</p>
+      <p class="eyebrow" id="today-label">YOUR NEXT SMALL WIN</p>
       <h1 id="greeting">Good morning, Gabriel.</h1>
       <p>One small project. Just JavaScript.</p>
     </section>
 
     <section class="progress-card" aria-labelledby="progress-title">
-      <div class="progress-copy"><span id="progress-title">Weekly progress</span><strong id="progress-text">0 of 7</strong></div>
+      <div class="progress-copy"><span id="progress-title">Your learning collection</span><strong id="progress-text">0 of 100</strong></div>
       <div class="progress-track"><span id="progress-fill"></span></div>
-      <div class="week" id="week-days" aria-label="Days this week"></div>
+      <div class="cycle-summary" id="week-days" aria-label="Project cycle progress"></div>
     </section>
 
     <section class="project-card">
-      <div class="project-topline"><span class="level" id="level">BEGINNER</span><button class="swap-btn" id="swap-project" type="button" aria-label="Shuffle to another project">⇄ Shuffle project</button></div>
+      <div class="project-topline"><span class="level" id="level">BEGINNER</span><button class="swap-btn" id="swap-project" type="button" aria-label="Next project">Next project →</button></div>
       <h2 id="project-title"></h2>
       <p id="project-description"></p>
       <div class="concepts" id="concepts"></div>
       <div class="mission"><span>YOUR MISSION</span><p id="mission"></p></div>
+      <details class="validation-requirements"><summary>What will be checked</summary><ul id="requirements"></ul></details>
       <button class="hint-btn" id="hint-button" type="button">💡 Give me a hint</button>
       <div class="hint-box" id="hint-box" hidden aria-live="polite">
         <span id="hint-number">HINT 1 OF 3</span>
@@ -41,6 +44,7 @@
       </div>
     </section>
 
+    <section id="completion-explanation" class="completion-explanation" hidden><strong>WHAT YOU LEARNED</strong><p></p></section>
     <button class="complete-btn" id="complete-project" type="button" disabled>🔒 Pass the project to unlock</button>
     </div>
 
@@ -48,12 +52,12 @@
     <section class="workspace" aria-label="JavaScript coding workspace">
       <div class="workspace-head">
         <div class="tabs" role="tablist"><button class="tab active" data-panel="code" role="tab">JavaScript</button><button class="tab" data-panel="preview" role="tab">Preview</button></div>
-        <span class="autosave" id="save-status">Saved</span>
+        <span class="autosave" id="save-status" role="status">Loading…</span>
       </div>
       <div class="panel active" id="code-panel">
         <div class="editor-wrap">
           <div class="line-numbers" id="line-numbers" aria-hidden="true">1</div>
-          <textarea id="code-editor" aria-label="JavaScript code editor" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+          <textarea id="code-editor" wrap="off" aria-label="JavaScript code editor" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
         </div>
         <div class="console" id="console-output" aria-live="polite"><span>Console ready.</span></div>
       </div>
@@ -61,16 +65,20 @@
       <div class="actions"><button class="secondary" id="reset-code" type="button">Reset</button><button class="run-btn" id="run-code" type="button"><span>▶</span> Save & Run</button></div>
     </section>
 
+    <div id="save-error" role="alert" hidden><p></p><button id="retry-save" type="button">Retry saving</button></div>
+    <section id="validation-results" class="validation-results" aria-live="polite" hidden><h3>Validation results</h3><ul></ul></section>
     <details class="starter-files">
-      <summary>View the provided HTML & CSS</summary>
+      <summary>View provided files & local resources</summary>
       <p>You don't need to edit these. They're already connected to your JavaScript.</p>
-      <div class="file-tabs"><button class="file-tab active" data-file="html">HTML</button><button class="file-tab" data-file="css">CSS</button></div>
+      <div class="file-tabs"><button class="file-tab active" data-file="html">HTML</button><button class="file-tab" data-file="css">CSS</button><button class="file-tab" data-file="wiring">Wiring</button><button class="file-tab" data-file="resources">Resources</button></div>
       <pre id="starter-code"></pre>
     </details>
     </div>
   </main>
   <footer>Built for daily practice • Your work stays on this device</footer>
-  <script src="more-projects.js?v=1"></script>
-  <script src="app.js?v=6"></script>
+  <iframe id="validator" title="Automated project validation" sandbox="allow-scripts" tabindex="-1" aria-hidden="true"></iframe>
+  <script src="mobile/src/core/progress.js"></script>
+  <script src="mobile/src/core/preview-factory.js"></script>
+  <script src="app.js?v=7" defer></script>
 </body>
 </html>

@@ -18,3 +18,23 @@
   .project-card{padding:1.5rem}.starter-files{margin-top:1.2rem}.complete-btn{order:4}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Shared-curriculum additions; existing layout and responsive rules stay intact. */
+.cycle-summary{color:var(--muted);font-size:.75rem;line-height:1.6}
+#mission{white-space:pre-line}
+.validation-requirements{position:relative;z-index:1;margin-top:1rem;color:#aab5cf;font-size:.85rem;line-height:1.5}
+.validation-requirements summary{cursor:pointer;color:var(--cyan);padding:.5rem 0}
+.validation-requirements ul{padding-left:1.2rem;overflow-wrap:anywhere}
+.validation-requirements li{margin:.5rem 0;white-space:pre-wrap}
+.completion-explanation,.validation-results{border:1px solid #326f58;background:#112c28;border-radius:16px;padding:1rem;margin:1rem 0;color:var(--green);font-size:.85rem;line-height:1.5}
+.completion-explanation p{color:var(--ink);margin-bottom:0}
+.validation-results{border-color:var(--line);background:var(--panel);color:var(--ink)}
+.validation-results h3{margin-top:0;font-size:.95rem}.validation-results ul{padding-left:1.2rem;overflow-wrap:anywhere}.validation-results li{margin:.4rem 0}.validation-results .pass{color:var(--green)}.validation-results .fail{color:#ff8291}
+#app-notice,#load-error,#save-error{background:#302438;color:var(--orange);border-radius:12px;padding:1rem;margin-bottom:1rem;font-size:.85rem;line-height:1.5}
+#load-error button,#save-error button{background:var(--blue);color:white;border:0;border-radius:8px;padding:.75rem;font:inherit}
+#validator{position:fixed;left:-2000px;top:0;width:440px;height:500px;border:0;opacity:0;pointer-events:none}
+#save-status{max-width:9rem;text-align:right}.file-tabs{display:flex;flex-wrap:wrap}
+#code-editor:disabled{opacity:.5}button:disabled{cursor:default}
+[hidden]{display:none!important}
+#hint-text{white-space:pre-line}
+#app-notice button{margin-top:.5rem;background:var(--blue);color:white;border:0;border-radius:8px;padding:.65rem;font:inherit}

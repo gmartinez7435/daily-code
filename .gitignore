@@ -1,0 +1,11 @@
+# Project-local tools, caches, and disposable build/test output
+**/node_modules/
+**/.artifacts/
+**/.npm-cache/
+**/.expo/
+**/dist/
+**/web-build/
+**/test-results/
+**/playwright-report/
+**/__pycache__/
+.DS_Store

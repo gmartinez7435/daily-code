@@ -1,4 +1,4 @@
-/* CodeDaily web shell. Curriculum, validation, and queue algorithms are shared with Expo. */
+/* CodeDaily web shell. Bundled curriculum, validation, and saved progress. */
 (() => {
   'use strict';
   const $ = selector => document.querySelector(selector);
@@ -42,9 +42,14 @@
   function showStarter(type) {
     if (!project) return;
     document.querySelectorAll('[data-file]').forEach(button => button.classList.toggle('active', button.dataset.file === type));
-    $('#starter-code').textContent = type === 'html' ? project.html : type === 'css' ? project.css : type === 'wiring' ? project.providedJavaScript || 'No additional wiring. Connect this project’s events in your editor.' : JSON.stringify(resources, null, 2);
+    const source = type === 'html' ? project.displayHtml : type === 'css' ? project.displayCss : type === 'wiring' ? project.providedJavaScript || 'No additional wiring. Connect this project’s events in your editor.' : JSON.stringify(resources, null, 2);
+    $('#starter-code').innerHTML = window.CodeDailyHighlight(source, type === 'html' || type === 'css' ? type : 'js');
   }
   function updateLines() {
+    const editor = $('#code-editor'), colors = $('#code-highlight');
+    colors.innerHTML = window.CodeDailyHighlight(editor.value + '\n');
+    colors.scrollTop = editor.scrollTop;
+    colors.scrollLeft = editor.scrollLeft;
     $('#line-numbers').textContent = Array.from({ length: $('#code-editor').value.split('\n').length }, (_, i) => i + 1).join('\n');
     $('#line-numbers').scrollTop = $('#code-editor').scrollTop;
   }
@@ -68,16 +73,23 @@
     $('#hint-button').disabled = count >= project.hints.length;
     $('#hint-button').textContent = count >= project.hints.length ? 'All hints revealed' : count ? 'Show another hint' : '💡 Give me a hint';
   }
+  function setPreview(document) {
+    // A fresh frame avoids stale/blank srcdoc navigations in Chromium browsers.
+    const previous = $('#preview');
+    const frame = previous.cloneNode(false);
+    frame.srcdoc = document;
+    previous.replaceWith(frame);
+  }
   function invalidate(clearPreview = false) {
     activeRun = null; clearTimeout(timer); timer = null; lastPassed = false;
     $('#validator').srcdoc = '';
-    if (clearPreview) $('#preview').srcdoc = '';
+    if (clearPreview) setPreview('');
     $('#validation-results').hidden = true;
     $('#validation-results ul').replaceChildren();
     $('#run-code').textContent = '▶ Save & Run';
   }
   function renderProject() {
-    invalidate(true);
+    invalidate();
     project = projects.find(p => p.id === state.order[state.position]);
     $('#project-title').textContent = project.title;
     $('#project-title').dataset.projectId = project.id;
@@ -87,7 +99,9 @@
     $('#concepts').replaceChildren(...project.concepts.map(concept => { const span = document.createElement('span'); span.textContent = concept; return span; }));
     $('#requirements').replaceChildren(...project.validationRequirements.map(requirement => { const li = document.createElement('li'); li.textContent = requirement; return li; }));
     $('#code-editor').value = state.drafts[project.id] ?? project.starterJavaScript;
-    updateLines(); renderHints(); updateProgress(); showStarter('html'); switchPanel('code');
+    updateLines(); renderHints(); updateProgress(); showStarter('html');
+    switchPanel('preview');
+    setPreview(preview.buildStaticDocument(project));
     feedback('Write your JavaScript, then Save & Run.');
   }
   function edit() {
@@ -112,10 +126,10 @@
     activeRun = { id, projectId: project.id, code, settled: false };
     feedback('Running behavioral checks…', 'progress');
     $('#run-code').textContent = '↻ Restart run';
-    // Separate sandboxed documents: test fixtures never mutate the learner's preview data.
-    $('#preview').srcdoc = preview.buildDocument(project, code, id, 'preview', state.sandbox[project.id] || {});
-    $('#validator').srcdoc = preview.buildDocument(project, code, id, 'test');
     switchPanel('preview');
+    // Separate sandboxed documents: test fixtures never mutate the learner's preview data.
+    setPreview(preview.buildDocument(project, code, id, 'preview', state.sandbox[project.id] || {}));
+    $('#validator').srcdoc = preview.buildDocument(project, code, id, 'test');
     timer = setTimeout(() => {
       if (activeRun?.id !== id || activeRun.settled) return;
       invalidate(true); updateProgress();
@@ -165,10 +179,11 @@
     loaded = false; enable(false); $('#load-error').hidden = true;
     try {
       if (!projects) {
-        const paths = ['mobile/src/data/projects.json', 'mobile/src/data/resources.json', 'mobile/src/core/runtime-source.json'];
-        const [catalog, localResources, runtime] = await Promise.all(paths.map(async path => { const response = await fetch(path); if (!response.ok) throw Error(`Cannot load ${path}`); return response.json(); }));
-        if (catalog.length !== 100 || !progress || !window.createCodeDailyPreview) throw Error('The shared curriculum could not be loaded.');
-        projects = catalog; resources = localResources; preview = window.createCodeDailyPreview(resources, runtime);
+        const catalog = window.CodeDailyProjects;
+        if (!Array.isArray(catalog) || catalog.length !== 100 || !progress || !window.CodeDailyPreview || !window.CodeDailyResources) {
+          throw Error('Required web files are missing. Keep the data/ and core/ folders alongside index.html.');
+        }
+        projects = catalog; resources = window.CodeDailyResources; preview = window.CodeDailyPreview;
       }
       const raw = localStorage.getItem(KEY), restored = progress.restore(raw, projects);
       if (restored.recovered && raw) {
@@ -180,7 +195,7 @@
       const hour = new Date().getHours(); $('#greeting').textContent = `Good ${hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening'}, Gabriel.`;
     } catch (error) {
       loaded = false; enable(false); $('#complete-project').disabled = true; $('#save-status').textContent = 'Not loaded';
-      $('#load-error p').textContent = `Could not load CodeDaily. Serve the project root over HTTP (for example: python3 -m http.server 8000). Existing progress has not been replaced. ${error.message}`;
+      $('#load-error p').textContent = `Could not load CodeDaily. Existing progress has not been replaced. ${error.message}`;
       $('#load-error').hidden = false;
     }
   }
@@ -192,7 +207,7 @@
     state.hints[project.id] = Math.min(project.hints.length, (state.hints[project.id] || 0) + 1); save(); renderHints();
   });
   $('#reset-code').addEventListener('click', () => {
-    if (loaded && confirm('Replace this draft with the starter JavaScript? Completion history is kept.')) { $('#code-editor').value = project.starterJavaScript; edit(); $('#preview').srcdoc = ''; switchPanel('code'); }
+    if (loaded && confirm('Replace this draft with the starter JavaScript? Completion history is kept.')) { $('#code-editor').value = project.starterJavaScript; edit(); setPreview(preview.buildStaticDocument(project)); switchPanel('code'); }
   });
   $('#code-editor').addEventListener('input', edit);
   $('#code-editor').addEventListener('scroll', updateLines);

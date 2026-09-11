@@ -1,0 +1,13 @@
+{
+  "name": "codedaily-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "generate": "node scripts/author-curriculum.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "test:browser": "node scripts/check-browser.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

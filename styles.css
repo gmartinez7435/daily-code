@@ -38,3 +38,14 @@
 [hidden]{display:none!important}
 #hint-text{white-space:pre-line}
 #app-notice button{margin-top:.5rem;background:var(--blue);color:white;border:0;border-radius:8px;padding:.65rem;font:inherit}
+
+/* Matching text layers keep native textarea editing and selection accessible. */
+.editor-surface{position:relative;flex:1;min-width:0;height:100%;overflow:hidden}
+.editor-surface #code-highlight,.editor-surface #code-editor{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:.8rem;border:0;font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:normal;tab-size:2;white-space:pre;word-break:normal;overflow:auto;max-height:none;border-radius:0}
+.editor-surface #code-highlight{pointer-events:none;color:#dbe6ff;background:#0b1122;scrollbar-width:none}
+.editor-surface #code-highlight::-webkit-scrollbar{display:none}
+.editor-surface #code-editor{background:transparent;color:transparent;caret-color:#edf2ff;-webkit-text-fill-color:transparent}
+.editor-surface #code-editor::selection{background:rgba(95,140,255,.35)}
+.syntax-keyword,.syntax-tag{color:#569cd6}.syntax-string{color:#ce9178}.syntax-comment{color:#6a9955}.syntax-number{color:#b5cea8}.syntax-function{color:#dcdcaa}.syntax-attribute{color:#9cdcfe}
+#starter-code{white-space:pre;word-break:normal}
+@media (forced-colors:active){.editor-surface #code-editor{color:CanvasText;-webkit-text-fill-color:CanvasText}.editor-surface #code-highlight{visibility:hidden}}

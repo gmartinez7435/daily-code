@@ -1,81 +1,64 @@
-# CodeDaily — web and iPhone
+# CodeDaily — JavaScript practice on the web
 
-One 100-project JavaScript curriculum, with the original web interface and a native Expo mobile app. Both use the same exercise content, hints, explanations, mock APIs, ES modules, behavioral validators, and shuffle/progress algorithms. There is no AI generation or backend.
+100 bundled mini-projects, from beginner through advanced JavaScript, in the existing CodeDaily layout. The phone project is no longer required. Curriculum, hints, explanations, mock APIs, validation and progress logic all live in this web project.
 
-## Run the website
+## Open the app
 
-From this repository root:
+Open **index.html** in your browser. All app content loads through local script files; there is no JSON fetch or dependency on a mobile folder.
+
+For a consistent browser-storage origin and offline page caching, run a static server from this folder:
 
 ```sh
 python3 -m http.server 8000
 ```
 
-Open **http://localhost:8000**. Any static HTTP server works; no npm install, build step, API key, or mobile dependencies are needed for the web app. Opening `index.html` directly as a `file://` URL is not supported because the app loads the shared JSON files.
+Then visit **http://localhost:8000**. No npm installation, build step, API key, or backend is needed to use the app. Keep `data/` and `core/` next to `index.html` when copying or serving it. Use the same address and port to keep the same saved progress. Browser handling of storage for direct file URLs can vary; HTTP is the recommended daily-use option.
 
-Serve the repository root, not just index.html: the web page also needs `styles.css`, `app.js`, `sw.js`, and the referenced files in `mobile/src/`. Keep using the same hostname and port to retain the same browser storage.
+If you had the broken version open, refresh it once while online. The updated service worker replaces the old cache. It does not clear saved progress. After a successful load on localhost or HTTPS, the page and all content can load offline. For direct file opening, all content is already on disk; no service worker is needed.
 
-After the first successful load on localhost or HTTPS, the service worker caches the app shell and all learning content for offline reloads. Online requests refresh cached files; failed network requests fall back to the cached version. A new browser/device still needs its initial load. The exercise preview never requires an internet API. Browser storage and cached content can be removed by browser settings or private-session cleanup.
+## Learning behavior
 
-## Run the iPhone app
+- One project at a time, in a saved shuffled queue of 100 distinct IDs. Next advances without repetition until the cycle finishes, then reshuffles.
+- The first cycle starts with beginner exercises and gradually introduces harder work. Similar concepts are spread apart.
+- HTML/CSS appear immediately in the preview when a project loads. Provided files are displayed with readable indentation. Switch to JavaScript to write code, then use Save & Run. The editor and provided files use locally bundled syntax colors. Initial previews do not execute code or award completion.
+- A visible sandboxed preview runs the project. A separate sandboxed test frame checks real outputs, events, boundary cases, storage and async behavior. Completion requires every expected check to pass; merely running code or changing text is insufficient.
+- Drafts, hints, queue position, completed IDs/counts and project-local storage are saved in the browser. The existing `codedaily-progress-v1` storage key and project IDs are preserved.
+- Old `cd-*` records stay stored and can be downloaded with the previous-work button. They are not counted as strict-validator passes.
+- Fetch/API exercises use bundled simulated responses. Module exercises resolve to local data URLs. Normal practice requires no internet connection.
 
-Install Expo Go on the iPhone, then:
+Finite behavioral tests accept equivalent implementations; they do not prove correctness for every possible input or act as a tamper-proof exam system. A browser-blocking infinite loop may require refreshing the tab.
 
-```sh
-cd mobile
-npm install
-npx expo start --go
-```
+## Files
 
-Use the same Wi-Fi on the Mac and iPhone, scan the QR code with the iPhone Camera, and open Expo Go. Dependencies are already installed in this checkout; `npm install` is for a fresh checkout or dependency changes.
-
-Expo Go is a development preview. For reliable standalone offline cold launches, use the release-build and signing steps in [mobile/README.md](mobile/README.md). A release build bundles all content locally and needs no development server. Physical iPhone installation remains owner/device setup.
-
-## Shared source layout
-
-| Source | Used by |
+| File | Purpose |
 | --- | --- |
-| `mobile/src/data/projects.json` | Both apps; the one runtime curriculum catalog |
-| `mobile/src/data/resources.json` | Both apps; local responses and module source |
-| `mobile/src/core/progress.js` | Both apps; shuffled cycles, progress restoration, completion gating |
-| `mobile/src/core/preview-factory.js` | Both apps; isolated preview/test documents and expected check counts |
-| `mobile/src/core/runtime.browser.js` | Maintained browser runtime source |
-| `mobile/src/core/runtime-source.json` | Both apps; generated runtime text protected from Metro transformations |
-| `mobile/src/core/*.cjs` | Small CommonJS adapters for Expo and Node tests |
-| `app.js` | Web DOM/editor/storage UI and authenticated-by-frame run messages |
-| `mobile/App.tsx` | Native UI and AsyncStorage adapter |
+| `index.html`, `styles.css`, `app.js` | Existing layout/theme and web UI |
+| `data/projects.js` | Single runtime catalog of all 100 projects |
+| `data/resources.js` | Bundled API responses and module source |
+| `core/progress.js` | Queue, completion, restoration and storage helpers |
+| `core/runtime.js` | Sandboxed execution, mock fetch/storage and behavioral tests |
+| `core/preview.js` | Preview/test document construction |
+| `sw.js` | Offline app cache |
+| `scripts/author-curriculum.cjs`, `scripts/explanations.cjs` | Recovered authoring source for the original 100 projects |
+| `tests/solutions.json` | Reference solutions for development verification; not loaded by the app |
+| `more-projects.js` | Unused original 30-project-era source, retained for reference |
 
-The web page reads the existing catalog directly; no second web catalog or generated web copy is introduced. The source remains under `mobile/src/` to keep the Expo project self-contained. The browser-compatible shared files expose browser globals while the mobile adapters import the same implementations.
+To edit curriculum content, update the authoring source and run `node scripts/author-curriculum.cjs`. This regenerates the one catalog and test references. Do not edit the generated catalog separately.
 
-`more-projects.js` remains as unused legacy source, per the instruction not to delete source code. It is no longer loaded and does not contribute exercises or validation. `tests/solutions.json` is test-only reference code, not loaded by either app. Generated curriculum/runtime files are required application source and must not be removed as disposable build output.
+## Development checks (optional)
 
-See [all 100 projects](mobile/PROJECTS.md). To update authored content, edit `mobile/scripts/author-curriculum.cjs` or `mobile/scripts/explanations.cjs`, then run `npm run generate` from `mobile/`. Test both apps after shared-code changes.
-
-## Web behavior and existing progress
-
-Save & Run saves the draft, starts a visible sandboxed preview and a separate sandboxed validator, and records completion only after all expected behavioral checks pass. Tests exercise multiple inputs, DOM events, boundary conditions, storage, or async/timer behavior. Merely changing text, pressing Run, or clicking the completion button does not pass a project. Old-run messages and messages from any other frame are ignored. This is a learning tool, not a tamper-proof examination system; finite tests cannot prove correctness for every possible input.
-
-Next moves through a persisted 100-project queue. Each project appears once per cycle, including skipped projects. The next cycle reshuffles; early first-cycle exercises are beginner-level, with related concepts spaced apart. Distinct completed projects and total per-cycle completions are tracked separately.
-
-Web drafts, hint counts, queue, current position, completion records, and preview localStorage live in the browser under `codedaily-progress-v1`. Web saves occur on edits and state changes; failures leave the draft in memory with a visible Retry action. Reloading restores saved work. Another tab changing progress requires reload before further edits to avoid overwriting it. Web and mobile storage are separate; no sync or automatic transfer is claimed.
-
-Old `cd-code-*` drafts and `cd-completions` records are retained verbatim. When present, **Download previous work** exports them without deleting them. They are not silently imported into different starter contracts, and old weak-validator completions do not count as passes under the new requirements.
-
-A 20-second watchdog clears stalled runs when the browser can service it. Arbitrary learner JavaScript can still monopolize a browser thread; reload a frozen tab if necessary. Preview code runs in sandboxed frames without same-origin privileges, and actual external connections are blocked by CSP.
-
-## Tests
-
-The installed development tools live under `mobile/`:
+Core checks need Node.js only:
 
 ```sh
-cd mobile
-npm run check
-npm test
-npm run test:web
-npm run test:browser
+node --test tests/*.test.cjs
 ```
 
-Browser suites require Playwright browser binaries. Temporary project-local browser downloads were removed during final cleanup; see the optional browser setup commands in `mobile/README.md` when you deliberately want to rerun those suites. Running the website or either app does **not** require Playwright browsers. Do not reinstall browsers just to run the app.
+Automated browser tests need the optional npm development dependency and a browser download:
 
-Use `ENGINE=webkit` to select WebKit. Chromium tests exercise offline browser reload; the WebKit web test makes the HTTP server unavailable because Playwright's forced offline navigation returns an internal WebKit error before cached page loading. The shared preview suites still use offline browser contexts in both engines.
+```sh
+npm install
+PLAYWRIGHT_BROWSERS_PATH=.artifacts/browsers npx playwright install chromium --only-shell
+PLAYWRIGHT_BROWSERS_PATH=.artifacts/browsers npm run test:browser
+```
 
-See [the verification and cleanup report](CLEANUP.md) for results, removed temporary files, retained source, and known external tool files.
+The browser suite tests all 100 reference solutions, rejects blank and unfinished starters, and exercises the real web app over HTTP, directly from disk, and with cached HTTP content offline. Browser downloads, screenshots and caches are temporary, Git-ignored files. They are not required for running CodeDaily.

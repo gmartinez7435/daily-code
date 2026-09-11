@@ -1,9 +1,12 @@
 // Cache only application source/content. Never cache dependencies or test/build artifacts.
-const CACHE = 'codedaily-web-v1';
+const CACHE = 'codedaily-web-v4-syntax-preview';
 const FILES = ['./', './index.html', './styles.css', './app.js',
-  './mobile/src/core/progress.js', './mobile/src/core/preview-factory.js',
-  './mobile/src/data/projects.json', './mobile/src/data/resources.json', './mobile/src/core/runtime-source.json'];
-self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES))));
+  './data/projects.js', './data/resources.js', './core/progress.js', './core/runtime.js', './core/preview.js', './core/highlight.js'];
+self.addEventListener('install', event => event.waitUntil((async () => {
+  const cache = await caches.open(CACHE);
+  await cache.addAll(FILES);
+  await self.skipWaiting();
+})()));
 self.addEventListener('activate', event => event.waitUntil((async () => {
   for (const key of await caches.keys()) if (key.startsWith('codedaily-web-') && key !== CACHE) await caches.delete(key);
   await self.clients.claim();
